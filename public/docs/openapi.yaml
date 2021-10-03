@@ -1,0 +1,243 @@
+openapi: 3.0.3
+info:
+    title: Laravel
+    description: ''
+    version: 1.0.0
+servers:
+    -
+        url: 'http://localhost'
+paths:
+    /api/auth/register:
+        post:
+            summary: ''
+            description: ''
+            parameters:
+                -
+                    in: header
+                    name: Content-Type
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+                -
+                    in: header
+                    name: Accept
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+            responses: {  }
+            tags:
+                - Endpoints
+            security: []
+    /api/auth/login:
+        post:
+            summary: ''
+            description: ''
+            parameters:
+                -
+                    in: header
+                    name: Content-Type
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+                -
+                    in: header
+                    name: Accept
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+            responses: {  }
+            tags:
+                - Endpoints
+            security: []
+    /api/me:
+        get:
+            summary: ''
+            description: ''
+            parameters:
+                -
+                    in: header
+                    name: Content-Type
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+                -
+                    in: header
+                    name: Accept
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+            responses:
+                401:
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                example:
+                                    message: Unauthenticated.
+                                properties:
+                                    message: { type: string, example: Unauthenticated. }
+            tags:
+                - Endpoints
+            security: []
+    /api/auth/logout:
+        post:
+            summary: ''
+            description: ''
+            parameters:
+                -
+                    in: header
+                    name: Content-Type
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+                -
+                    in: header
+                    name: Accept
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+            responses: {  }
+            tags:
+                - Endpoints
+            security: []
+    /api/roles:
+        get:
+            summary: ''
+            description: ''
+            parameters:
+                -
+                    in: header
+                    name: Content-Type
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+                -
+                    in: header
+                    name: Accept
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+            responses:
+                401:
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                example:
+                                    message: Unauthenticated.
+                                properties:
+                                    message: { type: string, example: Unauthenticated. }
+            tags:
+                - Endpoints
+            security: []
+    /api/permissions:
+        get:
+            summary: ''
+            description: ''
+            parameters:
+                -
+                    in: header
+                    name: Content-Type
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+                -
+                    in: header
+                    name: Accept
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+            responses:
+                401:
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                example:
+                                    message: Unauthenticated.
+                                properties:
+                                    message: { type: string, example: Unauthenticated. }
+            tags:
+                - Endpoints
+            security: []
+    '/api/{any}':
+        get:
+            summary: ''
+            description: ''
+            parameters:
+                -
+                    in: header
+                    name: Content-Type
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+                -
+                    in: header
+                    name: Accept
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+            responses:
+                404:
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                example:
+                                    status: Error
+                                    message: 'The route is not defind!'
+                                properties:
+                                    status: { type: string, example: Error }
+                                    message: { type: string, example: 'The route is not defind!' }
+            tags:
+                - Endpoints
+            security: []
+        post:
+            summary: ''
+            description: ''
+            parameters:
+                -
+                    in: header
+                    name: Content-Type
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+                -
+                    in: header
+                    name: Accept
+                    description: ''
+                    example: application/json
+                    schema:
+                        type: string
+            responses: {  }
+            tags:
+                - Endpoints
+            security: []
+        parameters:
+            -
+                in: path
+                name: any
+                description: ''
+                example: soluta
+                required: true
+                schema:
+                    type: string
