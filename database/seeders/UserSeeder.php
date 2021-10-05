@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             [
                 'email'=>'awssam@awssam.com',
                 'name'=>'awssam',
-                'password'=>bcrypt(env('ADMIN_FIRST_PASSWORD'))
+                'password'=>bcrypt('1993830')
             ]
         ];
 
