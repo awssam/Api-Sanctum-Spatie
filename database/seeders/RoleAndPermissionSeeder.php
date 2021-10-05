@@ -34,12 +34,12 @@ class RoleAndPermissionSeeder extends Seeder
         $role->givePermissionTo(Permission::all());
 
         // or may be done by chaining
-        Role::create(['name' => 'manager'])->givePermissionTo(['create','read','update']);
+        Role::create(['name' => 'manager','guard_name' => 'sanctum'])->givePermissionTo(['create','read','update']);
 
-        $role = Role::create(['name' => 'moderator']);
+        $role = Role::create(['name' => 'moderator','guard_name' => 'sanctum']);
         $role->givePermissionTo('read','update');
 
-        $role = Role::create(['name' => 'guest']);
+        $role = Role::create(['name' => 'guest','guard_name' => 'sanctum']);
         $role->givePermissionTo('read');
     }
 }
