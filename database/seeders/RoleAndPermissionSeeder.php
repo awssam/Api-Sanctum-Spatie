@@ -26,7 +26,7 @@ class RoleAndPermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission){
-            Permission::updateOrCreate(['name'=>$permission['name']],$permission);
+            Permission::updateOrCreate($permission,$permission);
         }
 
         // this can be done as separate statements
