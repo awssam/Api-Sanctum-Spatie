@@ -10,24 +10,18 @@ Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/me', function (Request $request) {
-         if(auth()->user()->can('prosess')){
-            
-            auth()->user()->getRoleNames();
-            auth()->user()->getDirectPermissions();
-            return 'can prosess';
-        }
-        if(auth()->user()->can('read')){
-            
-            auth()->user()->getRoleNames();
-            auth()->user()->getDirectPermissions();
-            return 'can read';
-        }
+
         if(auth()->user()->can('create')){
             
-            auth()->user()->getRoleNames();
-            auth()->user()->getDirectPermissions();
-            return auth()->user();
+            $permission = \Spatie\Permission\Models\Permission::updateOrCreate(['name'=>'ilias'],['name'=>'ilias']);
+            $role = \Spatie\Permission\Models\Role::create(['name' => 'super-ilias']);
+            $role->givePermissionTo($permission);
+
+            $user = App\Models\User::find(2);
+            $user->assignRole('super-ilias');
+
         }
+
     });
 
    
@@ -46,6 +40,20 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 
 
+
+
+        $users = [
+            [
+                'email'=>'awssam@awssam.com',
+                'name'=>'awssam',
+                'password'=>bcrypt('1993830')
+            ]
+        ];
+
+        foreach ($users as $user){
+            $u = User::updateOrCreate(['email' => $user['email']], $user);
+            $u->assignRole('super-admin');
+        }
 
 
 
