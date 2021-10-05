@@ -10,7 +10,13 @@ Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/me', function (Request $request) {
-         if(auth()->user()->can('read')){
+         if(auth()->user()->can('prosess')){
+            
+            auth()->user()->getRoleNames();
+            auth()->user()->getDirectPermissions();
+            return 'can prosess';
+        }
+        if(auth()->user()->can('read')){
             
             auth()->user()->getRoleNames();
             auth()->user()->getDirectPermissions();
