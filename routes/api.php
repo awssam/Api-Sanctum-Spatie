@@ -10,18 +10,25 @@ Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/me', function (Request $request) {
+         if(auth()->user()->can('read')){
+            
+            auth()->user()->getRoleNames();
+            auth()->user()->getDirectPermissions();
+            return 'can read';
+        }
+        if(auth()->user()->can('ilias')){
+            
 
+            auth()->user()->getRoleNames();
+            auth()->user()->getDirectPermissions();
+            return auth()->user();
+        }
         if(auth()->user()->can('create')){
             
-            $permission = \Spatie\Permission\Models\Permission::updateOrCreate(['name'=>'ilias'],['name'=>'ilias']);
-            $role = \Spatie\Permission\Models\Role::create(['name' => 'super-ilias']);
-            $role->givePermissionTo($permission);
-
-            $user = App\Models\User::find(2);
-            $user->assignRole('super-ilias');
-
+            auth()->user()->getRoleNames();
+            auth()->user()->getDirectPermissions();
+            return auth()->user();
         }
-
     });
 
    
@@ -37,6 +44,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         return  \Spatie\Permission\Models\Permission::all();
     });
 });
+
+
+
+
+
+
+
+
 
 
 
