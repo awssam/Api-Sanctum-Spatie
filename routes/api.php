@@ -14,6 +14,7 @@ Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
 Route::group(['middleware' => ['auth:sanctum']], function () {
     
     Route::get('/auth/info', [AuthController::class, 'infoAction'])->name('info');
+    Route::get('/auth/logout', [AuthController::class, 'logoutAction'])->name('logout');
 
 
 });
