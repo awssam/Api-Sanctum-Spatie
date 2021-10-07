@@ -74,6 +74,14 @@ class AuthController extends Controller
 
     }
 
+    public function infoAction(Request $request)
+    {
+        auth()->user()->getRoleNames();
+        auth()->user()->getDirectPermissions();
+        $user = auth()->user();
+        return $this->success($user);
+        
+    }
 
     public function logout()
     {
