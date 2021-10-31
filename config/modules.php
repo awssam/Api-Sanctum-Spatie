@@ -26,7 +26,7 @@ return [
 
     'stubs' => [
         'enabled' => false,
-        'path' => base_path() . '/vendor/nwidart/laravel-modules/src/Commands/stubs',
+        'path' => base_path() . '/stubs/modules',
         'files' => [
             'routes/web' => 'Routes/web.php',
             'routes/api' => 'Routes/api.php',
@@ -119,7 +119,7 @@ return [
             'repository' => ['path' => 'Repositories', 'generate' => false],
             'event' => ['path' => 'Events', 'generate' => false],
             'listener' => ['path' => 'Listeners', 'generate' => false],
-            'policies' => ['path' => 'Policies', 'generate' => true],
+            'policies' => ['path' => 'Policies', 'generate' => false],
             'rules' => ['path' => 'Rules', 'generate' => false],
             'jobs' => ['path' => 'Jobs', 'generate' => false],
             'emails' => ['path' => 'Emails', 'generate' => false],
@@ -210,10 +210,10 @@ return [
     */
 
     'composer' => [
-        'vendor' => 'awssam',
+        'vendor' => 'nwidart',
         'author' => [
-            'name' => 'Saidi Awssam',
-            'email' => 'awtsoft@gmail.com',
+            'name' => 'Nicolas Widart',
+            'email' => 'n.widart@gmail.com',
         ],
     ],
 

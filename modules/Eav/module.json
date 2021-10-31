@@ -1,0 +1,13 @@
+{
+    "name": "Eav",
+    "alias": "eav",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Eav\\Providers\\EavServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

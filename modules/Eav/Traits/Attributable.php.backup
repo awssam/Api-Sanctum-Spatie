@@ -1,0 +1,229 @@
+<?php
+
+namespace Modules\Eav\Traits;
+
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
+
+use Modules\Eav\Models\Attribute;
+use Modules\Eav\Supports\EavSupport;
+
+
+trait Attributable
+{
+
+
+
+
+
+
+    
+    protected $trashedEav = [];
+
+    public function __call($method, $parameters)
+    {   
+        if ($method == 'getTableo')
+            return static::getTable();  
+
+        if ($method == 'find')  
+            return static::query()->where($this->getTable().'.'.$this->getKeyName(), '=', $parameters[0])->firstOrFail();
+        return parent::__call($method, $parameters);
+    }
+
+    public function scopeWhereId($query,$id){
+            return $query->where($this->getTable().'.'.$this->getKeyName(), '=', $id);
+    }
+
+
+    public function scopeWithAttributes($query,$attributes = false){
+        $query = ($query->getQuery()->columns) ? $query : $query->addSelect($this->getTable().'.*');
+        foreach ($this->loadAttributes() as $attribute) { // $attribute => Object [custom_field , code_name]
+            if(!$attributes)
+                $query = $this->__addAttributeToQuery($query,$attribute);
+            else
+                $query = $this->__addAttributeFilterToQuery($query,$attribute,$attributes);
+        }
+        return $query;
+    }
+
+    /**
+     * __addAttributeFilterToQuery will add the attribute to the query ws filter it's dedicated for searching and filtrers
+     * @return query
+     */
+    public function __addAttributeFilterToQuery($query,$attribute,$filters)
+    {   
+        // get the table name where the value of this attribute should be stored in
+        $attribute_table_name = EavSupport::getTable($attribute->type,self::class);
+
+        // self class table name
+        $class_table_name = $this->getTable();
+
+        // to get the filter type == Nested | Array | string
+        $filter_type = EavSupport::filterType($filters);
+
+        // string type filter like withAttributes(['size','description'])
+        if($filter_type == 'String'){
+            if ($attribute->name == $filters) {
+                return $query
+                ->leftJoin($attribute_table_name.' AS '.$attribute->slug, function($join) use ($attribute,$class_table_name){
+                        $join->on($class_table_name.'.'.$this->getKeyName(), '=', $attribute->slug.'.entity_id')
+                            ->where($attribute->slug.'.attribute_id', '=', $attribute->id);
+                        if(app()->getStore())
+                            $join->where($attribute->slug.'.store_id', '=', app()->getStore());
+                        })
+                ->addSelect(array($attribute->slug.'.value as '.$attribute->name));
+            }
+        }else{
+          foreach ($filters as $filter) {
+                // filter name  is the attribute name Type array contain string while type Nested contain arrays
+                $filter_name = ($filter_type == 'Nested') ?  $filter[0] : $filter;
+                if ($attribute->name == $filter_name) {
+                    return $query
+                    ->{$filter_type == 'Nested' ? 'join' : 'leftJoin'}($attribute_table_name.' AS '.$attribute->slug, function($join) use ($attribute,$filter,$class_table_name,$filter_type){
+                            $join->on($class_table_name.'.'.$this->getKeyName(), '=', $attribute->slug.'.entity_id')
+                                ->where($attribute->slug.'.attribute_id', '=', $attribute->id);
+                            if(app()->getStore())
+                                $join->where($attribute->slug.'.store_id', '=', app()->getStore());
+                            if($filter_type == 'Nested')
+                                $join->where($attribute->slug.'.value', $filter[1], $filter[2]);
+                        })
+                    ->addSelect(array($attribute->slug.'.value as '.$attribute->name));
+                }else{
+
+                    // the else here is only for the nested case to add the other attribute wich are not filtred to the query
+
+                    if($filter_type == 'Nested')
+                    return $query
+                ->leftJoin($attribute_table_name.' AS '.$attribute->slug, function($join) use ($attribute,$class_table_name){
+                        $join->on($class_table_name.'.'.$this->getKeyName(), '=', $attribute->slug.'.entity_id')
+                            ->where($attribute->slug.'.attribute_id', '=', $attribute->id);
+                        if(app()->getStore())
+                            $join->where($attribute->slug.'.store_id', '=', app()->getStore());
+                        })
+                ->addSelect(array($attribute->slug.'.value as '.$attribute->name));
+                }
+            }
+        }
+        return $query;
+    }
+
+    /**
+     * __addAttributeToQuery will add the attribute to the query
+     * @return query
+     */
+    public function __addAttributeToQuery($query,$attribute)
+    {
+        return 
+            $query
+            ->leftJoin(EavSupport::getTable($attribute->type,self::class).' AS '.$attribute->slug, function($join) use ($attribute){
+                    $join->on($this->getTable().'.'.$this->getKeyName(), '=', $attribute->slug.'.entity_id')
+                        ->where($attribute->slug.'.attribute_id', '=', $attribute->id);
+                    if(app()->getStore())
+                        $join->where($attribute->slug.'.store_id', '=', app()->getStore());
+                    })
+            ->addSelect(array($attribute->slug.'.value as '.$attribute->name));
+    }
+
+
+     /**
+     * createAttribute will create a new attribut to this class if not existed before
+     * @return Instance of Attribute | Boolean 
+     */
+    public static function createAttribute($attribute_name,$attribute_type){
+        $key = 'attributes-'.Str::slug(str_replace(['\\','/'], ' ', self::class));
+        $reflectionClass = explode('\\', self::class);
+        $slug = Str::slug($attribute_name.' '.end($reflectionClass),'-');
+        $attribute = Attribute::where('slug','=',$slug)->first();
+        if(!$attribute){
+            Cache::forget($key);
+            return Attribute::create([
+                'model' => self::class,
+                'slug' => $slug,
+                'name' => $attribute_name,
+                'type' => get_class(EavSupport::getModel($attribute_type,self::class))
+            ]);
+        }
+        return $attribute;
+
+    }
+
+
+    /**
+     * __saveAttribute will save in the needed table ProductVarchar per example the value and the store.
+     * @return AttributeValue[TYPE] Model | mixed  
+     */
+    public function __saveAttribute($attribute_name,$value,$store = 0){
+        // deprecated
+        foreach ($this->loadAttributes() as $attribute) {
+            if($attribute->name == $attribute_name){
+                $attribute_model = EavSupport::getModel($attribute->type,self::class);
+                return 
+                    $attribute_model->create([
+                       'value' => $value,
+                       'entity_id' => $this->getKey(),
+                       'store_id' => $store,
+                       'attribute_id' => $attribute->id
+                    ]);
+            }
+        }
+    }
+
+
+    /**
+     * loadAttributes will fetch all attributes objects of the current attributable class.
+     * @return Collection Attribute  
+     */
+    protected function loadAttributes()
+    {   
+        // $key = 'attributes-'.Str::slug(str_replace(['\\','/'], ' ', self::class));      
+        // return Cache::rememberForever($key, function () {
+            return Attribute::where([['model','=',self::class]])->get();  //  App\Models\Product
+        // });
+    }
+
+    public function save(Array $options = [])
+    {
+        $class_attributes = $this->loadAttributes();
+        $i=0;
+        foreach ($this->getAttributes() as $attribute_name => $value) {
+            foreach ($class_attributes as $attribute) {
+                if($attribute_name == $attribute->name){
+                    unset($this->attributes[$attribute->name]);
+                    $this->trashedEav[$i] = new \stdClass();
+                    $this->trashedEav[$i]->attribute = $attribute;
+                    $this->trashedEav[$i]->value = $value;
+                    $i++;
+                }
+            }
+        }
+        // now will proceed the saving without the modules
+        parent::save($options);
+        $this->eavSave($options);
+        $this->trashedEav = [];
+    }
+
+    public function eavSave($options)
+    {   
+        foreach ($this->trashedEav as $key => $eav) {
+            if($eav->value != $this->getOriginal($eav->attribute->name)){
+                $attribute_model = EavSupport::getModel($eav->attribute->type,self::class)->where([['attribute_id','=',$eav->attribute->id],['store_id','=', $this->store_id],['entity_id','=',$this->getKey()]])->first();
+                if($attribute_model){
+                    if($attribute_model->value != $eav->value)
+                    $attribute_model->update(['value'=>$eav->value]);
+                }else{
+                    $attribute_model = EavSupport::getModel($eav->attribute->type,self::class);
+                    $attribute_model->create([
+                       'value' => $eav->value,
+                       'entity_id' => $this->getKey(),
+                       'store_id' => $this->store_id,
+                       'attribute_id' => $eav->attribute->id
+                    ]);
+                }
+            }
+
+            $this->attributes[$key] = $eav->value;
+        }
+    }
+
+
+}
