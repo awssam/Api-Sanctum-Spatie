@@ -5,6 +5,9 @@ namespace Modules\Eav\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Database\Query\Builder;
+use Modules\Eav\Supports\EavSupport;
+use Modules\Eav\Concerns\EavQueryBuilder;
+
 
 class EavServiceProvider extends ServiceProvider
 {
@@ -42,6 +45,7 @@ class EavServiceProvider extends ServiceProvider
 
          Builder::macro('orderByAttributeAsc', function ($src) {return $this->orderBy($src);});
          Builder::macro('orderByAttributeDesc', function ($src) {return $this->orderBy($src,'desc');});
+         Builder::macro('withAttributes', function ($args = false) {  return EavQueryBuilder::withAttributes($this,$args);});
 
     }
 

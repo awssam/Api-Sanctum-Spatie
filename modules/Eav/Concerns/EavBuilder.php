@@ -2,6 +2,7 @@
 
 namespace Modules\Eav\Concerns;
 use Modules\Eav\Supports\EavSupport;
+use Illuminate\Database\Eloquent\Model;
 
 
 trait EavBuilder
@@ -11,39 +12,9 @@ trait EavBuilder
   public function __call($method, $parameters)
     {   
 
-         if($method == 'where'){
-             if(self::getType($parameters) == 'value'){
-                if($parameters[0] == $this->getKeyName()){
-                    $parameters[0] = $this->getTable().'.'.$parameters[0];
-                }
-             } 
-         }
-
-         if($method == 'whereAttribute'){
-            $query = $this->getQuery();
-            $query = ($query->columns) ? $query : $query->addSelect($this->getTable().'.*');
-
-            $method = 'where';
-             if(self::getType($parameters) == 'value'){
-                if($parameters[0] == $this->getKeyName()){
-                    $parameters[0] = $this->getTable().'.'.$parameters[0];
-                }else{
-                    $attributes = self::loadEavAttributes();
-                    foreach ($attributes as $key => $attribute) {
-                        if($attribute['code_name'] == $parameters[0]){
-                            $parameters[0] = EavSupport::getTable($attribute['type']).'.'.$attribute['field_name'];
-                            $tb = $this->getTable();
-                            $key_nm = $this->getKeyName();
-                            // $query->addSelect(array(EavSupport::getTable($attribute['type']).'.'.$attribute['field_name'].' as '.$attribute['code_name']));
-                             $query->leftJoin(EavSupport::getTable($attribute['type']), function($join) use ($attribute,$tb,$key_nm){
-                                $join->on($tb.'.'.$key_nm, '=', EavSupport::getTable($attribute['type']).'.entity_id');
-                                }
-                            );
-                        }
-                    }
-                    return $this->forwardCallTo($query, $method, $parameters);
-                }
-             } 
+       
+         if($method == 'whereAttribute' || $method == 'where' || $method == 'orWhere'){
+            return self::caller($this,$this->getQuery(),$parameters,$method);
          }
 
 
@@ -56,6 +27,35 @@ trait EavBuilder
         }
 
         return $this->forwardCallTo($this->newQuery(), $method, $parameters);
+    }
+
+
+    public static function caller(Model $instance,$query,$parameters,$method)
+    {
+
+            $query = ($query->columns) ? $query : $query->addSelect($instance->getTable().'.*');
+
+            $method = 'where';
+             if(EavSupport::getType($parameters) == 'value'){
+                if($parameters[0] == $instance->getKeyName()){
+                    $parameters[0] = $instance->getTable().'.'.$parameters[0];
+                }else{
+                    $attributes = self::loadEavAttributes();
+                    foreach ($attributes as $key => $attribute) {
+                        if($attribute['code_name'] == $parameters[0]){
+                            $parameters[0] = EavSupport::getTable($attribute['type']).'.'.$attribute['field_name'];
+                            $tb = $instance->getTable();
+                            $key_nm = $instance->getKeyName();
+                            $query->join(EavSupport::getTable($attribute['type']), function($join) use ($attribute,$tb,$key_nm){
+                                $join->on($tb.'.'.$key_nm, '=', $join->table.'.entity_id')
+                                ->on($tb.'.'.$key_nm, '=', $join->table.'.entity_id');
+                                }
+                            );
+                        }
+                    }
+                    return $instance->forwardCallTo($query, $method, $parameters);
+                }
+             } 
     }
 
 
@@ -183,16 +183,5 @@ trait EavBuilder
     // }
 
 
-    /// leave it here
-    protected static function getType($parameters)
-    {
-        if(is_array($parameters)){
-            if(is_array($parameters[0])){
-                if(is_array($parameters[0][0])){
-                    return 'nested';
-                }return 'array';
-            }return 'value';
-        }
-        return false;
-    }
+
 }

@@ -5,6 +5,7 @@ namespace Modules\Eav\Supports;
 // use Illuminate\Support\Str;
 // use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
 
 use Modules\Eav\Models\AttributableModel;
 use Modules\Eav\Models\Attribute;
@@ -111,4 +112,59 @@ class EavSupport
     protected static function _addDecimal($column_name,$handlerType){Schema::table(self::getTable($handlerType), function($table) use ($column_name) { $table->decimal($column_name,10,4);});}
     protected static function _addDatetime($column_name,$handlerType){Schema::table(self::getTable($handlerType), function($table) use ($column_name) { $table->dateTime($column_name);});}
     protected static function _addText($column_name,$handlerType){Schema::table(self::getTable($handlerType), function($table) use ($column_name) { $table->text($column_name);});}
+
+    public static function getType($parameters)
+    {
+        if(is_array($parameters)){
+            if(is_array($parameters[0])){
+                if(is_array($parameters[0][0])){
+                    return 'nested';
+                }return 'array';
+            }return 'value';
+        }
+        return false;
+    }
+
+
+    public static function caller(Model $instance,$query,$parameters)
+    {
+
+        $query = ($query->columns) ? $query : $query->addSelect($instance->getTable().'.*');
+        $method = 'where';
+         if(EavSupport::getType($parameters) == 'value'){
+            if($parameters[0] == $instance->getKeyName()){
+                $parameters[0] = $instance->getTable().'.'.$parameters[0];
+            }else{
+                $attributes = self::loadEavAttributes($instance);
+                foreach ($attributes as $key => $attribute) {
+                    if($attribute['code_name'] == $parameters[0]){
+                        $parameters[0] = EavSupport::getTable($attribute['type']).'.'.$attribute['field_name'];
+                        $tb = $instance->getTable();
+                        $key_nm = $instance->getKeyName();
+                        $query->join(EavSupport::getTable($attribute['type']), function($join) use ($attribute,$tb,$key_nm){
+                            $join->on($tb.'.'.$key_nm, '=', $join->table.'.entity_id')
+                            ->on($tb.'.'.$key_nm, '=', $join->table.'.entity_id');
+                            }
+                        );
+                    }
+                }
+                return $instance->forwardCallTo($query, $method, $parameters);
+            }
+         } 
+    }
+
+    /**
+     * loadEavAttributes will fetch all attributes objects of the current attributable class.
+     * @return Array Attribute  
+     */
+    protected static function loadEavAttributes($class)
+    {   
+        $model_nam = self::registerModel($class);
+        try {
+            return Attribute::query()->select('field_name','code_name','type','attributable_model_id')->where('attributable_model_id',$model_nam)->get()->toArray();
+        } catch (Exception $e) { /* looks empty no fields exists */ }
+        return [];
+    }
+
+
 }

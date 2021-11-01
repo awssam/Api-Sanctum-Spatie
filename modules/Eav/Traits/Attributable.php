@@ -73,7 +73,7 @@ trait Attributable
     {   
         $model_nam = EavSupport::registerModel(self::class);
         try {
-            return Attribute::query()->select('field_name','code_name','type')->where('attributable_model_id',$model_nam)->get()->toArray();
+            return Attribute::query()->select('field_name','code_name','type','attributable_model_id')->where('attributable_model_id',$model_nam)->get()->toArray();
         } catch (Exception $e) { /* looks empty no fields exists */ }
         return [];
     }
@@ -91,16 +91,30 @@ trait Attributable
         return $array;
     }
 
-    public function scopeWithAttributes($query,$attributes = false){
+    public function scopeWithAttributes($query,...$attributes){
+        // if($attributes == false){
+            echo "attributes";
+            // dd($attributes);
+            echo "args";
+            // dd($args);
+        // }
         $query = ($query->getQuery()->columns) ? $query : $query->addSelect($this->getTable().'.*');
         foreach (self::loadEavAttributes() as $attribute) {
             if($attributes == false){
                 $query = $this->__addAttributeToQuery($query,$attribute);
-            }else{            
-                foreach ($attributes as $scoop_attribute) {
-                    if($attribute['code_name'] == $scoop_attribute)
-                        $query = $this->__addAttributeToQuery($query,$attribute);
-                }
+            }else{       
+                if(is_array($attributes)){
+                    foreach ($attributes as $scoop_attribute) {
+                        if($attribute['code_name'] == $scoop_attribute)
+                            $query = $this->__addAttributeToQuery($query,$attribute);
+                    }
+
+                }else{
+                        if($attribute['code_name'] == $attributes)
+
+                            $query = $this->__addAttributeToQuery($query,$attribute);
+
+                }  
             }
         }
         return $query;
@@ -120,13 +134,16 @@ trait Attributable
             $this->trashedJoins[] = EavSupport::getTable($attribute['type']);
             return 
             $query
-            ->leftJoin(EavSupport::getTable($attribute['type']), function($join) use ($attribute,$tb,$key_nm){
-                    $join->on($tb.'.'.$key_nm, '=', EavSupport::getTable($attribute['type']).'.entity_id');
+            ->join(EavSupport::getTable($attribute['type']), function($join) use ($attribute,$tb,$key_nm){
+                    $join->on($tb.'.'.$key_nm, '=', $join->table.'.entity_id')
+                                ->where($join->table.'.attributable_model_id', '=', $attribute['attributable_model_id']);
                     }
                 )
             ->addSelect(array(EavSupport::getTable($attribute['type']).'.'.$attribute['field_name'].' as '.$attribute['code_name']));
         }
     }
+
+
 
 }
 
