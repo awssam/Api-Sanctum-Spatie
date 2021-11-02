@@ -11,4 +11,12 @@ class Product extends ObjectModel
 
 	use \Modules\Eav\Traits\Attributable;
     use HasFactory;
+ 	
+ 	/**
+     * Get the comments for the blog post.
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

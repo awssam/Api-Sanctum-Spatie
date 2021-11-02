@@ -11,52 +11,11 @@ class EavQueryBuilder
 {
 
 
-
-    public static function whereAttribute__NOTUSED($query,$parameters)
-    {
-            $query = ($query->columns) ? $query : $query->addSelect($query->from.'.*');
-            $tableKey = 'id'; // can be enhanced 
-
-             if(EavSupport::getType($parameters) == 'value'){
-                if($parameters[0] == $tableKey){
-                    $parameters[0] = $query->from.'.'.$parameters[0];
-                }else{
-                    $attributes = self::loadEavAttributes('App\Models\Product');
-
-                    foreach ($attributes as $key => $attribute) {
-                        if($attribute['code_name'] == $parameters[0]){
-                            $parameters[0] = EavSupport::getTable($attribute['type']).'.'.$attribute['field_name'];
-                            $tb = $query->from;
-                             $query->join(EavSupport::getTable($attribute['type']), function($join) use ($attribute,$tb,$tableKey,$parameters){
-                                $join->on($tb.'.'.$tableKey, '=', $join->table.'.entity_id')
-                                ->where($join->table.'.attributable_model_id', '=', $attribute['attributable_model_id'])
-                                ->where($parameters[0],$parameters[1],$parameters[2]);
-                                }
-                            );
-                        }
-                    }
-                    // $joins = [];
-                    // unset($query->bindings->join[1]);
-                    // unset($query->joins[1]);
-                    foreach ($query->joins as $key => $join) {
-                        // echo $key.":".$join->toSql()."\r\n";
-                    //     if(in_array($join->table,$joins)){
-                    //         unset($query->joins[$key]);
-                    //     }
-                    //     $joins[] = $join->table;
-                    //     // print_r($join->table);
-                    }
-                    // dd(count($query->joins));
-                    return $query;
-                }
-             } 
-             // }
-
-    }
-  
-
+    // query is "Illuminate\Database\Eloquent\Builder"
+    // query is "Illuminate\Database\Query\Builder"
 
     public static function withAttributes($query,$attributes){
+        $query = ($query->columns) ? $query : $query->addSelect($query->from.'.*');
         $joins = [];
         $existedJoins = [];
         if(is_array($query->joins))
@@ -105,6 +64,8 @@ class EavQueryBuilder
         }
         return $query;
     }
+
+
 
     /**
      * loadEavAttributes will fetch all attributes objects of the current attributable class.

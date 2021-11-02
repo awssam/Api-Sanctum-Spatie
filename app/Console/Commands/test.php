@@ -72,11 +72,25 @@ class test extends Command
 
 
             // test 1
+        // echo get_class(Product::where('id','=',1)->withAttributes(['title','size','meta-title','description'])->first());
             // dd(Product::where('id','=',1)->withAttributes(['title','size','meta-title','description'])->first());
 
             // test 2 
-            dd(Product::withAttributes(['title','size','meta-title','description'])->where('id','=',1)->first());
-            
+            // dd(Product::withAttributes(['title','size','meta-title','description'])->where('products.id','=',1)->first());
+
+            // test 3
+            // dd(Product::with('categories')->withAttributes(['title','size','meta-title','description'])->where('products.id','=',1)->first());
+
+            // test 4
+            // dd(Product::with('comments')->first()->toArray());
+
+            // test 5
+            // dd(Product::with('comments')->where('products.id','=',1)->withAttributes(['title','size','meta-title','description'])->first());
+
+            // test6
+        // echo get_class(Product::with('comments')->where('products.id','=',1)->first());
+            dd(Product::with('comments')->where('products.id','=',1)->first());
+
             // $product = Product::where('id','=',1)->withAttributes(['title','size','meta-title','description'])->get();
 
             // $product = Product::find(1);

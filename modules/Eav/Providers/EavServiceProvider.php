@@ -42,9 +42,6 @@ class EavServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
-
-         // Builder::macro('orderByAttributeAsc', function ($src) {return $this->orderBy($src);});
-         // Builder::macro('orderByAttributeDesc', function ($src) {return $this->orderBy($src,'desc');});
          Builder::macro('withAttributes', function ($args = false) {  return EavQueryBuilder::withAttributes($this,$args);});
 
     }

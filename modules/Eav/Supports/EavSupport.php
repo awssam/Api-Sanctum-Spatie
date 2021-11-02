@@ -72,7 +72,7 @@ class EavSupport
 
     public static function getModels()
     {   
-            return AttributableModel::all()->toArray();
+        return AttributableModel::all()->toArray();
     }
 
 

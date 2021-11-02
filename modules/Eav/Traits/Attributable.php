@@ -8,6 +8,9 @@ use Modules\Eav\Concerns\EavBuilder;
 use Modules\Eav\Supports\EavSupport;
 use Modules\Eav\Events\ModelWasSavedEvent;
 
+
+use Modules\Eav\Concerns\EavQueryBuilder;
+
 use Modules\Eav\Models\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -79,70 +82,10 @@ trait Attributable
     }
 
 
-    // test
-    public function organizeSaving($attributes)
-    {
-        $array = [];
-        foreach ($attributes as $trash) {
-            $array[$trash->type][$trash->field_name] = $trash->value;
-            $array[$trash->type]['entity_id'] = $this->id;
-            $array[$trash->type]['model_name'] = get_class($this);
-        }
-        return $array;
+
+    public function scopeWithAttributes($query,$attributes){
+        return EavQueryBuilder::withAttributes($query->getQuery(),$attributes);
     }
-
-    public function scopeWithAttributes($query,...$attributes){
-        // if($attributes == false){
-            // echo "attributes";
-            // dd($attributes);
-            // echo "args";
-            // dd($args);
-        // }
-        $query = ($query->getQuery()->columns) ? $query : $query->addSelect($this->getTable().'.*');
-        foreach (self::loadEavAttributes() as $attribute) {
-            if($attributes == false){
-                $query = $this->__addAttributeToQuery($query,$attribute);
-            }else{       
-                if(is_array($attributes)){
-                    foreach ($attributes as $scoop_attribute) {
-                        if($attribute['code_name'] == $scoop_attribute)
-                            $query = $this->__addAttributeToQuery($query,$attribute);
-                    }
-
-                }else{
-                        if($attribute['code_name'] == $attributes)
-
-                            $query = $this->__addAttributeToQuery($query,$attribute);
-
-                }  
-            }
-        }
-        return $query;
-    }
-
-    /**
-     * __addAttributeToQuery will add the attribute to the query
-     * @return query
-     */
-    public function __addAttributeToQuery($query,$attribute)
-    {
-        $tb = $this->getTable();
-        $key_nm = $this->getKeyName();
-        if(in_array(EavSupport::getTable($attribute['type']), $this->trashedJoins)){
-            return $query->addSelect(array(EavSupport::getTable($attribute['type']).'.'.$attribute['field_name'].' as '.$attribute['code_name']));
-        }else{
-            $this->trashedJoins[] = EavSupport::getTable($attribute['type']);
-            return 
-            $query
-            ->join(EavSupport::getTable($attribute['type']), function($join) use ($attribute,$tb,$key_nm){
-                    $join->on($tb.'.'.$key_nm, '=', $join->table.'.entity_id')
-                                ->where($join->table.'.attributable_model_id', '=', $attribute['attributable_model_id']);
-                    }
-                )
-            ->addSelect(array(EavSupport::getTable($attribute['type']).'.'.$attribute['field_name'].' as '.$attribute['code_name']));
-        }
-    }
-
 
 
 }
