@@ -15,6 +15,7 @@ class EavQueryBuilder
     // query is "Illuminate\Database\Query\Builder"
 
     public static function withAttributes($query,$attributes){
+
         $query = ($query->columns) ? $query : $query->addSelect($query->from.'.*');
         $joins = [];
         $existedJoins = [];
