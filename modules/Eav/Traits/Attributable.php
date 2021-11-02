@@ -93,9 +93,9 @@ trait Attributable
 
     public function scopeWithAttributes($query,...$attributes){
         // if($attributes == false){
-            echo "attributes";
+            // echo "attributes";
             // dd($attributes);
-            echo "args";
+            // echo "args";
             // dd($args);
         // }
         $query = ($query->getQuery()->columns) ? $query : $query->addSelect($this->getTable().'.*');

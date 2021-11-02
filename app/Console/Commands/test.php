@@ -70,17 +70,31 @@ class test extends Command
         //     ]);
         // }
 
+
+            // test 1
+            // dd(Product::where('id','=',1)->withAttributes(['title','size','meta-title','description'])->first());
+
+            // test 2 
+            dd(Product::withAttributes(['title','size','meta-title','description'])->where('id','=',1)->first());
+            
+            // $product = Product::where('id','=',1)->withAttributes(['title','size','meta-title','description'])->get();
+
             // $product = Product::find(1);
             // $product = Product::withAttributes(['title','meta-title','description'])->find(1);
             // $product = Product::whereAttribute('id','=',3)->withAttributes()->orderByAttributeDesc('size')->get();
             // $product = Product::whereAttribute('size','=',14)->withAttributes()->get();
             $product = Product::
-            // withAttributes(['title','size'])
-            where('size','<',19)
+            // where('size','<',19)
+            // find(1)
+            where('id','=',1)
+            ->withAttributes(['title','size','meta-title','description'])
+            // ->whereNotNull('title')
             // ->orWhere('size','<',18)
-            ->withAttributes(['title','size'])
+            // ->withAttributes(['title','size'])
             // ->wherHas('size','<',12)
-            ->orderBy('id','desc');
+            // ->orderBy('id','asc');
+
+            ;
             // dd($product->joins);
             // $product = Product::find(1);
             // $product->description = 'dsds sd s s sd';
@@ -96,8 +110,8 @@ class test extends Command
 
             // $query = str_replace(array('?'), array('\'%s\''), $product->toSql());
             // $query = vsprintf($query, $product->getBindings());
-            dd($product->toSql());
-            // dd($product->get());
+            // dd($product->toSql());
+            dd($product->get());
         
     }
 }

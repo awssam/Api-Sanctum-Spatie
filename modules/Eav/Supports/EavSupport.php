@@ -65,11 +65,14 @@ class EavSupport
 
     public static function registerModel($class_name)
     {   
-        try {
-            $attr = AttributableModel::where('model_name',$class_name)->first();
-            if($attr) return $attr->id;            
-        } catch (Exception $e) { /* nothing to catch*/ }
-        return AttributableModel::create(['model_name' =>$class_name])->id;
+
+        $attr = AttributableModel::firstOrCreate(['model_name' => $class_name]);
+        return $attr->id;
+    }
+
+    public static function getModels()
+    {   
+            return AttributableModel::all()->toArray();
     }
 
 
@@ -123,47 +126,6 @@ class EavSupport
             }return 'value';
         }
         return false;
-    }
-
-
-    public static function caller(Model $instance,$query,$parameters)
-    {
-
-        $query = ($query->columns) ? $query : $query->addSelect($instance->getTable().'.*');
-        $method = 'where';
-         if(EavSupport::getType($parameters) == 'value'){
-            if($parameters[0] == $instance->getKeyName()){
-                $parameters[0] = $instance->getTable().'.'.$parameters[0];
-            }else{
-                $attributes = self::loadEavAttributes($instance);
-                foreach ($attributes as $key => $attribute) {
-                    if($attribute['code_name'] == $parameters[0]){
-                        $parameters[0] = EavSupport::getTable($attribute['type']).'.'.$attribute['field_name'];
-                        $tb = $instance->getTable();
-                        $key_nm = $instance->getKeyName();
-                        $query->join(EavSupport::getTable($attribute['type']), function($join) use ($attribute,$tb,$key_nm){
-                            $join->on($tb.'.'.$key_nm, '=', $join->table.'.entity_id')
-                            ->on($tb.'.'.$key_nm, '=', $join->table.'.entity_id');
-                            }
-                        );
-                    }
-                }
-                return $instance->forwardCallTo($query, $method, $parameters);
-            }
-         } 
-    }
-
-    /**
-     * loadEavAttributes will fetch all attributes objects of the current attributable class.
-     * @return Array Attribute  
-     */
-    protected static function loadEavAttributes($class)
-    {   
-        $model_nam = self::registerModel($class);
-        try {
-            return Attribute::query()->select('field_name','code_name','type','attributable_model_id')->where('attributable_model_id',$model_nam)->get()->toArray();
-        } catch (Exception $e) { /* looks empty no fields exists */ }
-        return [];
     }
 
 

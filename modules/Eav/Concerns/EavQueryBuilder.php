@@ -5,14 +5,14 @@ use Modules\Eav\Supports\EavSupport;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Modules\Eav\Models\Attribute;
+use Illuminate\Support\Str;
 
-
-class EavQueryBuilder extends EloquentBuilder
+class EavQueryBuilder 
 {
 
 
 
-    public static function whereAttribute($query,$parameters)
+    public static function whereAttribute__NOTUSED($query,$parameters)
     {
             $query = ($query->columns) ? $query : $query->addSelect($query->from.'.*');
             $tableKey = 'id'; // can be enhanced 
@@ -57,30 +57,50 @@ class EavQueryBuilder extends EloquentBuilder
 
 
     public static function withAttributes($query,$attributes){
-        // // if($attributes == false){
-        //     echo "attributes";
-        //     dd($attributes,get_class($query));
-        //     echo "args";
-        //     // dd($args);
-        // // }
-        dd(count($query->joins));
-        $query = ($query->getQuery()->columns) ? $query : $query->addSelect($this->getTable().'.*');
-        foreach (self::loadEavAttributes() as $attribute) {
-            if($attributes == false){
-                $query = $this->__addAttributeToQuery($query,$attribute);
-            }else{       
-                if(is_array($attributes)){
-                    foreach ($attributes as $scoop_attribute) {
-                        if($attribute['code_name'] == $scoop_attribute)
-                            $query = $this->__addAttributeToQuery($query,$attribute);
+        $joins = [];
+        $existedJoins = [];
+        if(is_array($query->joins))
+        foreach ($query->joins as $join) {
+            $existedJoins[] = $join->table;
+        }
+        if(is_array($attributes)){
+            $model_attributes = self::loadEavAttributes('App\Models\Product');
+            foreach ($attributes as $attribute) {
+                if ($model_attributes)
+                foreach ($model_attributes as $model_attribute) {
+
+                    if($model_attribute['code_name'] == $attribute){
+
+                        if(array_key_exists($model_attribute['type'], $joins)){
+                            $joins[$model_attribute['type']]['addSelect'][] = [
+                                'code_name' => $model_attribute['code_name'],
+                                'field_name' => $model_attribute['field_name']
+                            ];
+                        }else{
+                            $joins[$model_attribute['type']] = [
+                                'attributable_model_id' => $model_attribute['attributable_model_id'],
+                                'table' =>EavSupport::getTable($model_attribute['type']),
+                                'addSelect' =>[
+                                    [
+                                        'code_name' => $model_attribute['code_name'],
+                                        'field_name' => $model_attribute['field_name']
+                                    ]
+                                ]
+                            ];
+                        }
                     }
-
-                }else{
-                        if($attribute['code_name'] == $attributes)
-
-                            $query = $this->__addAttributeToQuery($query,$attribute);
-
-                }  
+                }
+            }
+            $key_nm = $query->from.'.id';
+            foreach ($joins as $class => $one_join) {
+                if(!in_array($one_join['table'],$existedJoins))
+                $query->join($one_join['table'], function($join) use ($one_join,$key_nm){
+                    $join->on($key_nm, '=', $join->table.'.entity_id')
+                        ->where($join->table.'.attributable_model_id', '=', $one_join['attributable_model_id']);
+                });
+                foreach ($one_join['addSelect'] as $key => $column) {
+                    $query->addSelect(array($one_join['table'].'.'.$column['field_name']. ' as '. $column['code_name']));
+                }
             }
         }
         return $query;
