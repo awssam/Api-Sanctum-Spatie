@@ -3,9 +3,7 @@
 namespace Modules\Eav\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Database\Query\Builder;
-use Modules\Eav\Supports\EavSupport;
 use Modules\Eav\Concerns\EavQueryBuilder;
 
 
@@ -42,7 +40,7 @@ class EavServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
-         Builder::macro('withAttributes', function ($args = false) {  return EavQueryBuilder::withAttributes($this,$args);});
+         Builder::macro('withAttributes', function ($args = false) { return EavQueryBuilder::withAttributes($this,$args);});
 
     }
 

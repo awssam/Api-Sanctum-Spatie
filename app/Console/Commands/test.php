@@ -49,7 +49,7 @@ class test extends Command
         // get attribute type
         // User::createAttribute('title','varchar');
         
-        // Product::createAttribute('title','varchar');
+        // Product::createAttribute('short-description','varchar');
         // Product::createAttribute('meta-title','varchar');
         // Product::createAttribute('meta-description','varchar');
         // Product::createAttribute('description','text');
@@ -72,25 +72,32 @@ class test extends Command
 
 
             // test 1
-        // echo get_class(Product::where('id','=',1)->withAttributes(['title','size','meta-title','description'])->first());
-            // $product = Product::where('id','=',1)->withAttributes(['title','size','meta-title','description'])->first();
+            // $product = Product::where('size','<',18)->withAttributes(['title','size','meta-title','description'])->get(); // working good
 
             // test 2 
-            // $product = Product::withAttributes(['title','size','meta-title','description'])->where('products.id','=',1)->first();
+            // $product = Product::withAttributes(['title','size','meta-title','description'])->where('products.id','=',1)->first(); // working good
 
             // test 3
-            // $product = Product::with('categories')->withAttributes(['title','size','meta-title','description'])->where('products.id','=',1)->first();
+            // $product = Product::with('comments')->where('products.id','>',3)->withAttributes(['title','size','meta-title','description'])->having('size','>',19)->first(); // working good
+            // dump(get_class($product));
+
 
             // test 4
-            // $product = Product::with('comments')->first()->toArray();
+            // $product = Product::with('comments')->first()->toArray(); // working good
 
             // test 5
-            $product = Product::with('comments')->where('products.id','=',1)->withAttributes(['title','size','meta-title','description'])->first(); // return an std class
+            // $product = Product::with('comments')->having('size','=',12)->withAttributes(['short-description','title','size','meta-title','description'])->first(); // return an std class without content
+            $product = Product::with('comments')->withAttributes('short-description','title','size','meta-title','description')->having('size','=',12)->first(); // return an std class without content
 
             // test6
+            // $product = Product::where('products.id','=',1)->withAttributes(['title','size','meta-title','description'])->first(); // return an std class without content
             // $product = Product::with('comments')->where('products.id','=',1)->first(); // working fine
 
-            dump(get_class($product));
+            // test 7
+            // $product = Product::where('size',12)->withAttributes(['title','size','meta-title','description'])->first();
+            // $product->title = 'somt';
+            // $product->save();
+            // dump(get_class($product));
             dump($product);
 
             die;

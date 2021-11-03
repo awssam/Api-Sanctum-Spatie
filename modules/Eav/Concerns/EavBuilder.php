@@ -11,9 +11,8 @@ trait EavBuilder
 
   public function __call($method, $parameters)
     {   
-
          if($method == 'whereAttribute' || $method == 'where' || $method == 'orWhere'){
-            return self::caller($this,$this->getQuery(),$parameters,$method);
+            return self::caller($this,$parameters,$method);
          }
 
 
@@ -29,11 +28,11 @@ trait EavBuilder
     }
 
 
-    public static function caller(Model $instance,$query,$parameters,$method)
+    public static function caller(Model $instance,$parameters,$method)
     {          
 
         if($method == 'whereAttribute') $method = 'where';
-        $query = ($query->columns) ? $query : $query->addSelect($instance->getTable().'.*');
+        $query = ($instance->getQuery()->columns) ? $instance->getQuery() : $instance->getQuery()->addSelect($instance->getTable().'.*');
 
         if(EavSupport::getType($parameters) == 'value'){
             if($parameters[0] == $instance->getKeyName())
