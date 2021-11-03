@@ -16,6 +16,7 @@ class CreateAttributableModelsTable extends Migration
         Schema::create('attributable_models', function (Blueprint $table) {
             $table->id();
             $table->string('model_name');
+            $table->string('table_name');
             $table->timestamps();
         });
     }

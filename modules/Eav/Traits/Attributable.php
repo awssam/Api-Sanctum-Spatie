@@ -4,15 +4,13 @@ namespace Modules\Eav\Traits;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
-use Modules\Eav\Concerns\EavBuilder;
-use Modules\Eav\Supports\EavSupport;
-use Modules\Eav\Events\ModelWasSavedEvent;
-
-
-use Modules\Eav\Concerns\EavQueryBuilder;
 
 use Modules\Eav\Models\Attribute;
-use Illuminate\Database\Eloquent\Collection;
+use Modules\Eav\Supports\EavSupport;
+use Modules\Eav\Concerns\EavBuilder;
+use Modules\Eav\Concerns\EavQueryBuilder;
+use Modules\Eav\Events\ModelWasSavedEvent;
+
 
 trait Attributable
 {

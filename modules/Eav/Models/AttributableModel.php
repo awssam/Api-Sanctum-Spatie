@@ -9,7 +9,7 @@ class AttributableModel extends ObjectModel
 {
     use HasFactory;
 
-    protected $fillable = ['model_name'];
+    protected $fillable = ['model_name','table_name'];
     
 	/**
      * Get the Attributes.

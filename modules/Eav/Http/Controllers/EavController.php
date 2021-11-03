@@ -15,7 +15,9 @@ class EavController extends Controller
      */
     public function index()
     {   
-        $products = Product::with('comments')->withAttributes('title','size','meta-title')->having('meta-title','LIKE','meta-title5%')->having('size',">",'12')->get(); // return an std class without content
+        // $products = Product::withAttributes()->having('meta-title','LIKE','meta-title5%')->having('size',">",'12')->get(); // return an std class without content
+        // $products = Product::with('comments')->where('products.id' ,'>', 19)->withAttributes()->having('meta-title','LIKE','meta-title5%')->having('size',">",'12')->get(); // return an std class without content
+            $products = Product::where('size','<',18)->withAttributes(['title','size','meta-title','description'])->get(); // working good
 
         return view('eav::index',compact('products'));
     }

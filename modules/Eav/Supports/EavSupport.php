@@ -63,10 +63,15 @@ class EavSupport
     }
 
 
-    public static function registerModel($class_name)
-    {   
+    public static function registerModel($class_name,$table_name = null)
+    {     
+     // dd($class_name);
+        if(!$table_name) {
+            $table_name = new $class_name();
+            $table_name = $table_name->getTable();
+        }
 
-        $attr = AttributableModel::firstOrCreate(['model_name' => $class_name]);
+        $attr = AttributableModel::firstOrCreate(['model_name' => $class_name,'table_name' => $table_name]);
         return $attr->id;
     }
 

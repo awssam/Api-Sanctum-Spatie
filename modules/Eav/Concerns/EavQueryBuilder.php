@@ -12,22 +12,27 @@ class EavQueryBuilder
 {
 
 
-    // query is "Illuminate\Database\Eloquent\Builder"
-    // query is "Illuminate\Database\Query\Builder" will return an std class
+    // queryBuilder is "Illuminate\Database\Eloquent\Builder"
+    // queryBuilder is "Illuminate\Database\Query\Builder" 
+    // this class function could be called from the Service provider Builder::macro using an QueryBuilder instance or from Model scope using EloquentBuilder
 
-    public static function withAttributes($queryBuilder,$attributes){
+    public static function withAttributes($builder,$attributes){
+        $builderInstance = get_class($builder);
+        if($builderInstance == QueryBuilder::class){
+            $models = EavSupport::getModels();
+            foreach ($models as $model_) {
+                if($model_['table_name'] == $builder->from){
+                    $instance = $model_['model_name']; // must be fixed
+                }
+            }
+            $query = $builder;
+            $builder = new EloquentBuilder($query);
+            $builder->setModel(new $instance); // change 3
+        }elseif ($builderInstance == EloquentBuilder::class){ 
+            $query = $builder->getQuery();
+            $instance = get_class($builder->getModel()); 
 
-
-        $queryBuilderInstance = get_class($queryBuilder);
-
-        $instance = \App\Models\Product::class; // must be fixed
-
-
-        if($queryBuilderInstance == QueryBuilder::class)
-            $query = $queryBuilder; // change 1
-        elseif ($queryBuilderInstance == EloquentBuilder::class) 
-            $query = $queryBuilder->getQuery();
-
+        }
         $query = ($query->columns) ? $query : $query->addSelect($query->from.'.*');
 
         
@@ -38,11 +43,7 @@ class EavQueryBuilder
             $existedJoins[] = $join->table;
         }
         if(is_array($attributes)){
-            if($queryBuilderInstance == QueryBuilder::class)
-                $model_attributes = self::loadEavAttributes($instance);  // change 2
-            elseif ($queryBuilderInstance == EloquentBuilder::class) 
-                $model_attributes = self::loadEavAttributes(get_class($queryBuilder->getModel()));
-
+            $model_attributes = self::loadEavAttributes($instance);  // change 2
             
             foreach ($attributes as $attribute) {
                 if ($model_attributes)
@@ -85,16 +86,7 @@ class EavQueryBuilder
 
 
 
-
-        if($queryBuilderInstance == QueryBuilder::class){
-            $queryBuilder = new EloquentBuilder($query);
-            $queryBuilder->setModel(new $instance); // change 3
-            $queryBuilder->setQuery($query); // change 3
-        }elseif ($queryBuilderInstance == EloquentBuilder::class) 
-            $queryBuilder->setQuery($query);
-        
-
-        return $queryBuilder;
+        return $builder;
 
 
     }
@@ -113,8 +105,5 @@ class EavQueryBuilder
         return [];
     }
 
-    public static function manageJoins($value='')
-    {
-        # code...
-    }
+
 }
