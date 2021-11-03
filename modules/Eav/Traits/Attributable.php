@@ -85,7 +85,7 @@ trait Attributable
 
     public function scopeWithAttributes($query,...$attributes){
         // dd($attributes);
-        if(count($attributes) == 0) $attributes = 'eav';
+        if(count($attributes) == 0) $attributes[] = 'eav';
         elseif(is_array($attributes[0])) $attributes = $attributes[0];
         return EavQueryBuilder::withAttributes($query,$attributes);
     }

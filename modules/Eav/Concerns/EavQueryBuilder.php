@@ -48,7 +48,7 @@ class EavQueryBuilder
                 if ($model_attributes)
                 foreach ($model_attributes as $model_attribute) {
 
-                    if($model_attribute['code_name'] == $attribute){
+                    if($model_attribute['code_name'] == $attribute || $attributes[0] == 'eav'){
 
                         if(array_key_exists($model_attribute['type'], $joins)){
                             $joins[$model_attribute['type']]['addSelect'][] = [
@@ -81,52 +81,6 @@ class EavQueryBuilder
                     $query->addSelect(array($one_join['table'].'.'.$column['field_name']. ' as '. $column['code_name']));
                 }
             }
-        }elseif($attributes == 'eav'){
-
-            if($queryBuilderInstance == QueryBuilder::class)
-                $model_attributes = self::loadEavAttributes($instance);  // change 2
-            elseif ($queryBuilderInstance == EloquentBuilder::class) 
-                $model_attributes = self::loadEavAttributes(get_class($queryBuilder->getModel()));
-
-            
-            // foreach ($attributes as $attribute) {
-                if ($model_attributes)
-                foreach ($model_attributes as $model_attribute) {
-
-                    // if($model_attribute['code_name'] == $attribute){
-
-                        if(array_key_exists($model_attribute['type'], $joins)){
-                            $joins[$model_attribute['type']]['addSelect'][] = [
-                                'code_name' => $model_attribute['code_name'],
-                                'field_name' => $model_attribute['field_name']
-                            ];
-                        }else{
-                            $joins[$model_attribute['type']] = [
-                                'attributable_model_id' => $model_attribute['attributable_model_id'],
-                                'table' =>EavSupport::getTable($model_attribute['type']),
-                                'addSelect' =>[
-                                    [
-                                        'code_name' => $model_attribute['code_name'],
-                                        'field_name' => $model_attribute['field_name']
-                                    ]
-                                ]
-                            ];
-                        }
-                    // }
-                }
-            // }
-            $key_nm = $query->from.'.id';
-            foreach ($joins as $class => $one_join) {
-                if(!in_array($one_join['table'],$existedJoins))
-                $query->join($one_join['table'], function($join) use ($one_join,$key_nm){
-                    $join->on($key_nm, '=', $join->table.'.entity_id')
-                        ->where($join->table.'.attributable_model_id', '=', $one_join['attributable_model_id']);
-                });
-                foreach ($one_join['addSelect'] as $key => $column) {
-                    $query->addSelect(array($one_join['table'].'.'.$column['field_name']. ' as '. $column['code_name']));
-                }
-            }
-
         }
 
 

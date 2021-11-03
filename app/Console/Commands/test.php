@@ -87,7 +87,8 @@ class test extends Command
 
             // test 5
             // $product = Product::with('comments')->having('size','=',12)->withAttributes(['short-description','title','size','meta-title','description'])->first(); // return an std class without content
-            $product = Product::with('comments')->withAttributes('short-description','title','size','meta-title','description')->having('size','=',12)->first(); // return an std class without content
+            // $product = Product::with('comments')->withAttributes('short-description','title','size','meta-title','description')->having('size','=',12)->first(); // return an std class without content
+            $product = Product::with('comments')->withAttributes()->having('size','=',12)->first(); // return an std class without content
 
             // test6
             // $product = Product::where('products.id','=',1)->withAttributes(['title','size','meta-title','description'])->first(); // return an std class without content
