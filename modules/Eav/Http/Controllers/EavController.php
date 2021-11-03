@@ -5,6 +5,7 @@ namespace Modules\Eav\Http\Controllers;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use App\Models\Product;
 
 class EavController extends Controller
 {
@@ -13,8 +14,10 @@ class EavController extends Controller
      * @return Renderable
      */
     public function index()
-    {
-        return view('eav::index');
+    {   
+        $products = Product::with('comments')->withAttributes('title','size','meta-title')->having('meta-title','LIKE','meta-title5%')->having('size',">",'12')->get(); // return an std class without content
+
+        return view('eav::index',compact('products'));
     }
 
     /**
