@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Console\Command;
+use Modules\Cronjob\Command;
 
 class {{ class }} extends Command
 {
@@ -20,6 +20,15 @@ class {{ class }} extends Command
      */
     protected $description = 'Command description';
 
+
+    /**
+     * The cron object
+     *
+     * @var Modules\Cronjob\Models\CronJob;
+     */
+    // public $cron;
+
+
     /**
      * Create a new command instance.
      *
@@ -35,8 +44,9 @@ class {{ class }} extends Command
      *
      * @return int
      */
-    public function handle()
+    public function logic()
     {
+        // put your code logic here
         return 0;
     }
 }

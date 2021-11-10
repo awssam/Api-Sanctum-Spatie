@@ -15,9 +15,9 @@ class CreateCronJobLogsTable extends Migration
     {
         Schema::create('cron_job_logs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('cron_job_id');
-            $table->string('output_type')->nullable();
-            $table->longText('output_text');
+            $table->integer('cron_job_id');
+            $table->string('output_type',60)->nullable();
+            $table->longText('output_text')->nullable();
             $table->timestamps();
         });
     }

@@ -2,9 +2,7 @@
 
 namespace $NAMESPACE$;
 
-use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
+use Modules\Cronjob\Command;
 
 class $CLASS$ extends Command
 {
@@ -23,6 +21,15 @@ class $CLASS$ extends Command
     protected $description = 'Command description.';
 
     /**
+     * The cron object
+     *
+     * @var Modules\Cronjob\Models\CronJob;
+     */
+    // public $cron;
+
+
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -37,32 +44,12 @@ class $CLASS$ extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function logic()
     {
-        //
+        // put your code logic here
+        
     }
 
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['example', InputArgument::REQUIRED, 'An example argument.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null],
-        ];
-    }
 }
+
+

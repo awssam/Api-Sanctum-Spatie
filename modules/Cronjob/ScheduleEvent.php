@@ -22,8 +22,9 @@ class ScheduleEvent extends Event
     public function run(Container $container)
     {
         dump('doing it');
+        dump(getmypid());
         parent::run($container);
-        // dd($this->runInBackground);
+
     }
 
 }

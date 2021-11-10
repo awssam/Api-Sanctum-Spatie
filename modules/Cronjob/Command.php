@@ -49,8 +49,8 @@ class Command extends CommandBase
         if($this->logModel) {
             CronJobLog::create([
                 'cron_job_id' => $this->cronId,
-                'output_type' => $string,
-                'output_text' =>$style
+                'output_text' => $string,
+                'output_type' =>$style
             ]);
         }
 
