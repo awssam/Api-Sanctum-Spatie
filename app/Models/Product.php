@@ -9,7 +9,7 @@ class Product extends ObjectModel
 {	
     protected $fillable = ['name'];
 
-	use \Modules\Eav\Traits\Attributable;
+	use \Larattributes\Traits\Attributable;
     use HasFactory;
  	
  	/**

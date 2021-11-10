@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use Modules\Cronjob\Command;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Str;
@@ -24,25 +24,29 @@ class test extends Command
      */
     protected $description = 'Command description';
 
+
     /**
-     * Create a new command instance.
+     * The cron object
      *
-     * @return void
+     * @var Modules\Cronjob\Models\CronJob;
      */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+
+    public $cron;
+
+
 
     /**
      * Execute the console command.
      *
      * @return int
      */
-    public function handle()
+    public function logic()
     {
-        // return 0;
+ 
+        $this->info('salam');
+        $this->info(getmypid());
 
+        // dd($this->cron);
         // todo
         // check if attribute already created then add a new one
         // check if attribute not existed in other column otherwise duplicated attribute
@@ -140,15 +144,3 @@ class test extends Command
         
     }
 }
-
-// SELECT
-//     `products`.*,
-//     `attribute_varchars`.`v_0` AS `title`,
-//     `attribute_integers`.`v_0` AS `size`
-// FROM
-//     `products`
-// LEFT JOIN `attribute_varchars` ON (`products`.`id` = `attribute_varchars`.`entity_id` AND `attribute_varchars`.`attributable_model_id` = 1)
-// LEFT JOIN `attribute_integers` ON (`products`.`id` = `attribute_integers`.`entity_id` AND `attribute_integers`.`attributable_model_id` = 1 ) AND `attribute_integers`.`v_0` < 19
-// ORDER BY
-//     `attribute_integers`.`v_0`
-// DESC

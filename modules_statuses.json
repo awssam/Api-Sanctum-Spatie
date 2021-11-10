@@ -1,3 +1,8 @@
 {
-    "Eav": true
+    "Store": true,
+    "Catalog": true,
+    "Sales": true,
+    "Customer": true,
+    "MagentoSync": true,
+    "Cronjob": true
 }

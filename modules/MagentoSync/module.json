@@ -1,0 +1,13 @@
+{
+    "name": "MagentoSync",
+    "alias": "magentosync",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\MagentoSync\\Providers\\MagentoSyncServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

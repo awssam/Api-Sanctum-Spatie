@@ -1,0 +1,13 @@
+{
+    "name": "Cronjob",
+    "alias": "cronjob",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Cronjob\\Providers\\CronjobServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

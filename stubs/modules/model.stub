@@ -3,16 +3,10 @@
 namespace $NAMESPACE$;
 
 use App\ObjectModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class $CLASS$ extends ObjectModel
 {
-    use HasFactory;
 
     protected $fillable = $FILLABLE$;
     
-    protected static function newFactory()
-    {
-        return \$MODULE_NAMESPACE$\$MODULE$\Database\factories\$NAME$Factory::new();
-    }
 }

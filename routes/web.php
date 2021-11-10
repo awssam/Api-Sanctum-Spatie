@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\Product;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    // return \Illuminate\Support\Facades\Redirect::away('https://www.youtube.com/c/AyTiQaqa%C5%9F/videos');
+        $products = Product::where('size','<',18)->withAttributes(['title','size','meta-title','description'])->get(); // working good
+        return view('welcome',compact('products'));
+
 });

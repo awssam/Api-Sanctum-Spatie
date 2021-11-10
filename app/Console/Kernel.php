@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('test:eav')->everyMinute()->withoutOverlapping();
     }
 
     /**
@@ -37,5 +37,24 @@ class Kernel extends ConsoleKernel
         $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
+    }
+
+
+
+       /**
+     * Define the application's command schedule.
+     *
+     * @return void
+     */
+    protected function defineConsoleSchedule()
+    {   
+        if(class_exists(\Modules\Cronjob\Schedule::class)){
+
+        $this->app->instance(
+            'Illuminate\Console\Scheduling\Schedule', $schedule = new \Modules\Cronjob\Schedule
+        );
+        }
+
+        $this->schedule($schedule);
     }
 }
